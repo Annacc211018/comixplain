@@ -2,15 +2,15 @@
 //import imageData from "../assets.json" assert { type: "json" }; // << Not supported by Firefox, Safari, Opera
 
 let imageData;
-fetch('assets.json')
-  .then(response => {
+fetch("assets.json")
+  .then((response) => {
     if (!response.ok) {
-      throw new Error('Failed to fetch assets.json');
+      throw new Error("Failed to fetch assets.json");
     }
     return response.json();
   })
-  .then(data => {
-    imageData = data; 
+  .then((data) => {
+    imageData = data;
     // ---------------------------------------------
     //  load the page
     // ---------------------------------------------
@@ -26,9 +26,23 @@ fetch('assets.json')
     downloadButton.addEventListener("click", function () {
       downloadSelection(selectedAsset);
     });
+
+    // auto complete functionality using jquery ui
+    $(function () {
+      const availableTags = getAllKeywords(imageData);
+      $("#searchBarInput").autocomplete({
+        source: availableTags,
+        select: function (event, ui) {
+          const selectedKeyWord = ui.item.value;
+          searchBar(imageData, selectedKeyWord);
+          renderImages(filteredImagesBySearch);
+        },
+      });
+    });
   })
-  .catch(error => {
-    console.error('Error fetching assets.json:', error);
+
+  .catch((error) => {
+    console.error("Error fetching assets.json:", error);
   });
 
 // ---------------------------------------------
@@ -449,19 +463,6 @@ searchBarInput.addEventListener("search", (e) => {
     filterContainer.style.display = "flex";
     filterAssetsByActiveFilter(filteredImagesByCategory, activeFilter);
   }
-});
-
-// auto complete functionality using jquery ui
-$(function () {
-  const availableTags = getAllKeywords(imageData);
-  $("#searchBarInput").autocomplete({
-    source: availableTags,
-    select: function (event, ui) {
-      const selectedKeyWord = ui.item.value;
-      searchBar(imageData, selectedKeyWord);
-      renderImages(filteredImagesBySearch);
-    },
-  });
 });
 
 // button function - clear selection
